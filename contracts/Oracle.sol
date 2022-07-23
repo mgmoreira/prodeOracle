@@ -14,6 +14,8 @@ contract Oracle is Ownable{
     }
 
     Result[] results;
+    mapping (uint8 => Result) resultsMapping;
+    uint mappingLength;
 
     constructor() {
     }
@@ -32,7 +34,7 @@ contract Oracle is Ownable{
         uint8 penaltyLocal;
         uint8 penaltyVisitor;
 
-        for(uint counter; counter < _results.length;){
+        for(uint8 counter; counter < _results.length;){
             require(_results[counter].matches.length == 2 || _results[counter].matches.length == 3, "Wrong number of matches");
             penaltyLocal = 0;
             penaltyVisitor = 0;
@@ -56,7 +58,7 @@ contract Oracle is Ownable{
     //Example
     //[{firstMatchLocal: 1, firstMatchVisitor: 2, secondMatchLocal: 2, secondMatchVisitor: 4, penaltyMatchLocal:0, penaltyMatchVisitor:0}]
     function setResult(Result[] memory _results) public onlyOwner{
-        for(uint counter; counter < _results.length;){
+        for(uint8 counter; counter < _results.length;){
             console.log("Enfrentamiento %d PRIMER partido: %d - %d ", counter+1,
                                                     _results[counter].firstMatchLocal,
                                                     _results[counter].firstMatchVisitor
@@ -76,6 +78,23 @@ contract Oracle is Ownable{
         }
     }
 
+    //Opcion 3 de carga (utilizando mapping, ahorra gas)
+    //Example
+    //[{firstMatchLocal: 1, firstMatchVisitor: 2, secondMatchLocal: 2, secondMatchVisitor: 4, penaltyMatchLocal:0, penaltyMatchVisitor:0}]
+    function setResultMapping(Result[] memory _results) public onlyOwner{
+        mappingLength = _results.length;
+        for(uint8 counter; counter < _results.length;){
+            resultsMapping[counter] = Result(_results[counter].firstMatchLocal,
+                                             _results[counter].firstMatchVisitor,
+                                             _results[counter].secondMatchLocal,
+                                             _results[counter].secondMatchVisitor,
+                                             _results[counter].penaltyMatchLocal,
+                                             _results[counter].penaltyMatchVisitor);
+
+        unchecked{ counter++; }
+        }
+    }
+
     function getResult() public view returns(bool[] memory) {
         bool[] memory booleanResults = new bool[](results.length);
         for(uint counter; counter < results.length;){
@@ -85,7 +104,7 @@ contract Oracle is Ownable{
         return booleanResults;
     }
 
-    function getIndividualResult(Result memory result) private pure returns(bool flag){
+    function getIndividualResult(Result memory result) private view returns(bool flag){
         uint8 firstTeamScore = result.firstMatchLocal + result.secondMatchVisitor;
         uint8 secondTeamScore = result.secondMatchLocal + result.firstMatchVisitor;
         if(firstTeamScore > secondTeamScore){
@@ -101,6 +120,15 @@ contract Oracle is Ownable{
                 }
             }
         }
+    }
+
+    function getResultMapping() public view returns(bool[] memory) {
+        bool[] memory booleanResults = new bool[](mappingLength);
+        for(uint8 counter; counter < mappingLength;){
+            booleanResults[counter] = getIndividualResult(resultsMapping[counter]);
+            unchecked{ counter++; }
+        }
+        return booleanResults;
     }
 
 }

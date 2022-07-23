@@ -13,14 +13,19 @@ const main = async () => {
    // let oracleTxn = await oracleContract.setResult([{firstMatchLocal: 1, firstMatchVisitor: 2, secondMatchLocal: 2, secondMatchVisitor: 4, penaltyMatchLocal:0, penaltyMatchVisitor:0},
    //                                             {firstMatchLocal: 2, firstMatchVisitor: 2, secondMatchLocal: 2, secondMatchVisitor: 1, penaltyMatchLocal:0, penaltyMatchVisitor:0}]);
 
-    let oracleTxn3 = await oracleContract.setResultArray([{matches:[{score:[1,2]}, {score:[1,2]}, {score:[4,5]}]},
-                                                      {matches:[{score:[3,3]}, {score:[2,1]}]},
-                                                      {matches:[{score:[3,1]}, {score:[1,2]}]}]);
+    // let oracleTxn3 = await oracleContract.setResultArray([{matches:[{score:[1,2]}, {score:[1,2]}, {score:[4,5]}]},
+    //                                                   {matches:[{score:[3,3]}, {score:[2,1]}]},
+    //                                                   {matches:[{score:[3,1]}, {score:[1,2]}]}]);
+
+    let oracleTxn3 = await oracleContract.setResultMapping([{firstMatchLocal: 1, firstMatchVisitor: 2, secondMatchLocal: 2, secondMatchVisitor: 4, penaltyMatchLocal:0, penaltyMatchVisitor:0},
+                                                {firstMatchLocal: 2, firstMatchVisitor: 2, secondMatchLocal: 2, secondMatchVisitor: 1, penaltyMatchLocal:0, penaltyMatchVisitor:0}]);
 
     await oracleTxn3.wait();
 
 
-    oracleCount = await oracleContract.getResult();
+    // oracleCount = await oracleContract.getResult();
+    oracleCount = await oracleContract.getResultMapping();
+
     console.log("oracleCount: ", oracleCount);
 };
 
